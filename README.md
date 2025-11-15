@@ -1,59 +1,123 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# E-Ticaret API Case Study
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Bu proje, **PHP** 8.4 ve Laravel 12 kullanılarak geliştirilmiş, PostgreSQL altyapılı RESTful bir E-Ticaret **API**'sidir.
 
-## About Laravel
+## 📋 İçindekiler
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- [Kurulum Adımları](#kurulum-adımları)
+- [Veritabanı Kurulumu](#veritabanı-kurulumu)
+- [Test Kullanıcıları](#test-kullanıcıları)
+- [**API** Endpoint Listesi](#api-endpoint-listesi)
+- [Örnek İstek ve Yanıt](#örnek-istek-ve-yanıt)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🛠️ Kurulum Adımları
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Projeyi yerel ortamınızda çalıştırmak için aşağıdaki adımları izleyin:
 
-## Learning Laravel
+1. **Projeyi İndirin:**
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+    ```bash
+    git clone [GITHUB_REPO_LINKINIZ]
+    cd e-commerce-api
+    ```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+2. **Bağımlılıkları Yükleyin:**
 
-## Laravel Sponsors
+    ```bash
+    composer install
+    ```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+3. **Çevre Değişkenlerini Ayarlayın:**
+   `.env.example` dosyasının adını `.env` olarak değiştirin.
 
-### Premium Partners
+4. **Application Key Oluşturun:**
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+    ```bash
+    php artisan key:generate
+    ```
 
-## Contributing
+## 📚 Veritabanı Kurulumu
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Bu proje PostgreSQL kullanmaktadır.
 
-## Code of Conduct
+## PostgreSQL'de `e_commerce_api` adında boş bir veritabanı oluşturun.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+2. `.env` dosyasında veritabanı ayarlarını yapın:
 
-## Security Vulnerabilities
+```env DB_CONNECTION=pgsql DB_HOST=**127**.0.0.1 DB_PORT=**5432** DB_DATABASE=e_commerce_api DB_USERNAME=postgres DB_PASSWORD=sifreniz ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Otomatik Kurulum ve Sample Data:
 
-## License
+```bash php artisan migrate:fresh --seed ```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+(Alternatif olarak kök dizindeki `database_dump.sql` dosyasını veritabanınıza import edebilirsiniz.)
+
+## Sunucuyu Başlatın:
+
+```bash php artisan serve ```
+
+## 👤 Test Kullanıcıları
+
+| Rol   | Email                                   | Şifre    |
+| ----- | --------------------------------------- | -------- |
+| Admin | [admin@test.com](mailto:[admin@test.com](mailto:admin@test.com)) | admin123 |
+| User  | [user@test.com](mailto:[user@test.com](mailto:user@test.com))   | user123  |
+
+- **Admin Yetkileri:** Kategori ve Ürün ekleme/silme/güncelleme, Sipariş durumu değiştirme.
+- **User Yetkileri:** Sepet işlemleri, Sipariş verme, Profil görüntüleme.
+
+## 🔗 API Endpoint Listesi
+
+Detaylı dokümantasyon için Swagger arayüzünü kullanabilirsiniz: [http://**127**.0.0.1:**8000**/api/documentation](http://**127**.0.0.1:**8000**/api/documentation)
+
+### Auth
+
+- `**POST** /api/register` - Kayıt Ol
+- `**POST** /api/login` - Giriş Yap (Token döner)
+- `**GET** /api/profile` - Profil Görüntüle (Bearer Token gerekli)
+
+### Ürünler & Kategoriler
+
+- `**GET** /api/products` - Ürün Listesi (Filtreleme: `?search=abc&min_price=10`)
+- `**GET** /api/categories` - Kategori Listesi
+- `**POST** /api/products` - Ürün Ekle (Admin)
+
+### Sepet & Sipariş
+
+- `**POST** /api/cart/add` - Sepete Ekle
+- `**GET** /api/cart` - Sepeti Gör
+- `**POST** /api/orders` - Sipariş Ver
+
+## 🗒 Örnek İstek ve Yanıt
+
+### Giriş Yapma (Login)
+
+**Request:**
+
+```http **POST** /api/login Content-Type: application/json
+
+{
+    *email*: *[admin@test.com](mailto:admin@test.com)*,
+    *password*: *admin123*
+}
+```
+
+**Response (**200** OK):**
+
+```json
+{
+    *success*: true,
+    *message*: *Giriş başarılı*,
+    *data*: {
+    *user*: {
+    *id*: 1,
+    *name*: *Admin User*,
+    *email*: *[admin@test.com](mailto:admin@test.com)*,
+    *role*: *admin*
+    },
+    *token*: *1|XyZ...*
+    }
+}
+```
+
+```bash ```
