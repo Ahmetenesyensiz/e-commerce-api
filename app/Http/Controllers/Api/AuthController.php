@@ -41,14 +41,12 @@ class AuthController extends Controller
      * @OA\Response(response=422, description="Validasyon hatası")
      * )
      */
-    // 1. KULLANICI KAYDI (POST /api/register)
     public function register(Request $request)
     {
-        // PDF'teki Validasyon Kuralları
         $validator = Validator::make($request->all(), [
-            'name' => 'required|min:2',       // [cite: 80]
-            'email' => 'required|email|unique:users', // [cite: 81]
-            'password' => 'required|min:8',   // [cite: 82]
+            'name' => 'required|min:2',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:8',
         ]);
 
         if ($validator->fails()) {
@@ -106,8 +104,6 @@ class AuthController extends Controller
      * @OA\Response(response=401, description="Hatalı giriş")
      * )
      */
-    
-    // 2. KULLANICI GİRİŞİ (POST /api/login)
     public function login(Request $request)
     {
         if (!Auth::attempt($request->only('email', 'password'))) {
@@ -148,7 +144,6 @@ class AuthController extends Controller
      * @OA\Response(response=401, description="Yetkisiz erişim")
      * )
      */
-    // 3. PROFİL GÖRÜNTÜLEME (GET /api/profile)
     public function profile(Request $request)
     {
         return response()->json([
@@ -186,12 +181,10 @@ class AuthController extends Controller
      * @OA\Response(response=401, description="Yetkisiz erişim")
      * )
      */
-    // 4. PROFİL GÜNCELLEME (PUT /api/profile) -> EKSİK OLAN BUYDU
     public function updateProfile(Request $request)
     {
         $user = $request->user();
 
-        // Güncelleme için validasyon (Email değişirse unique olmalı ama kendi maili hariç)
         $validator = Validator::make($request->all(), [
             'name' => 'required|min:2',
             'email' => 'required|email|unique:users,email,'.$user->id,
@@ -206,7 +199,6 @@ class AuthController extends Controller
             ], 422);
         }
 
-        // Sadece gelen verileri güncelle
         if ($request->has('name')) $user->name = $request->name;
         if ($request->has('email')) $user->email = $request->email;
         if ($request->has('password')) $user->password = Hash::make($request->password);
@@ -237,7 +229,6 @@ class AuthController extends Controller
      * @OA\Response(response=401, description="Yetkisiz erişim")
      * )
      */
-    // ÇIKIŞ (LOGOUT)
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();

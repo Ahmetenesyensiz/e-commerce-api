@@ -30,15 +30,12 @@ class CartController extends Controller
      * @OA\Response(response=401, description="Yetkisiz erişim")
      * )
      */
-    // 1. SEPETİ GÖRÜNTÜLE (GET /api/cart)
     public function index()
     {
         $user = Auth::user();
         
-        // Kullanıcının sepeti var mı? Yoksa oluştur.
         $cart = Cart::firstOrCreate(['user_id' => $user->id]);
 
-        // Sepeti, içindeki ürünlerle (ve ürün detaylarıyla) getir
         $cart->load('items.product');
 
         return response()->json([
@@ -75,7 +72,6 @@ class CartController extends Controller
      * @OA\Response(response=422, description="Validasyon hatası")
      * )
      */
-    // 2. SEPETE ÜRÜN EKLE (POST /api/cart/add)
     public function add(Request $request)
     {
         $request->validate([
@@ -86,23 +82,19 @@ class CartController extends Controller
         $user = Auth::user();
         $cart = Cart::firstOrCreate(['user_id' => $user->id]);
         
-        // Ürün stok kontrolü (Bonus: Fonksiyonel Bonuslar) [cite: 103]
         $product = Product::find($request->product_id);
         if ($product->stock_quantity < $request->quantity) {
              return response()->json(['success' => false, 'message' => 'Yetersiz stok!'], 400);
         }
 
-        // Ürün zaten sepette var mı?
         $cartItem = CartItem::where('cart_id', $cart->id)
                             ->where('product_id', $request->product_id)
                             ->first();
 
         if ($cartItem) {
-            // Varsa miktarını artır
             $cartItem->quantity += $request->quantity;
             $cartItem->save();
         } else {
-            // Yoksa yeni ekle
             CartItem::create([
                 'cart_id' => $cart->id,
                 'product_id' => $request->product_id,
@@ -144,7 +136,6 @@ class CartController extends Controller
      * @OA\Response(response=422, description="Validasyon hatası")
      * )
      */
-    // 3. ÜRÜN MİKTARI GÜNCELLE (PUT /api/cart/update)
     public function update(Request $request)
     {
         $request->validate([
@@ -167,7 +158,6 @@ class CartController extends Controller
             return response()->json(['success' => false, 'message' => 'Ürün sepette bulunamadı'], 404);
         }
 
-        // Stok Kontrolü (Yine Bonus!)
         $product = Product::find($request->product_id);
         if ($product->stock_quantity < $request->quantity) {
              return response()->json(['success' => false, 'message' => 'Yetersiz stok!'], 400);
@@ -207,7 +197,6 @@ class CartController extends Controller
      * @OA\Response(response=401, description="Yetkisiz erişim")
      * )
      */
-    // 4. SEPETTEN ÜRÜN ÇIKAR (DELETE /api/cart/remove/{product_id})
     public function remove($product_id)
     {
         $user = Auth::user();
@@ -243,7 +232,6 @@ class CartController extends Controller
      * @OA\Response(response=401, description="Yetkisiz erişim")
      * )
      */
-    // 5. SEPETİ TEMİZLE (DELETE /api/cart/clear)
     public function clear()
     {
         $user = Auth::user();

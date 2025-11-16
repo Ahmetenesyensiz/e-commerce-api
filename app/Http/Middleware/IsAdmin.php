@@ -15,6 +15,13 @@ class IsAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
+    if ($request->user() && $request->user()->role === 'admin') {
         return $next($request);
+    }
+
+    return response()->json([
+        'success' => false,
+        'message' => 'Bu işlem için yetkiniz yok (Admin only).'
+    ], 403);
     }
 }

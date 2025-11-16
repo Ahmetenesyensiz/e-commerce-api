@@ -26,7 +26,6 @@ class CategoryController extends Controller
      * )
      * )
      */
-    // 1. LİSTELEME (Herkese Açık)
     public function index()
     {
         $categories = Category::all();
@@ -66,7 +65,6 @@ class CategoryController extends Controller
      * @OA\Response(response=403, description="Admin yetkisi gerekli")
      * )
      */
-    // 2. EKLEME (Sadece Admin)
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -127,7 +125,6 @@ class CategoryController extends Controller
      * @OA\Response(response=403, description="Admin yetkisi gerekli")
      * )
      */
-    // 3. GÜNCELLEME (Sadece Admin)
     public function update(Request $request, string $id)
     {
         $category = Category::find($id);
@@ -184,7 +181,6 @@ class CategoryController extends Controller
      * @OA\Response(response=403, description="Admin yetkisi gerekli")
      * )
      */
-    // 4. SİLME (Sadece Admin)
     public function destroy(string $id)
     {
         $category = Category::find($id);

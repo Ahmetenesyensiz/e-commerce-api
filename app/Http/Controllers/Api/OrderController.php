@@ -14,7 +14,7 @@ use App\Models\CartItem;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB; // Transaction için gerekli
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -37,56 +37,46 @@ class OrderController extends Controller
      * @OA\Response(response=401, description="Yetkisiz erişim")
      * )
      */
-    // 1. SİPARİŞ OLUŞTUR (POST /api/orders)
     public function store()
     {
         $user = Auth::user();
         
-        // Kullanıcının sepetini bul
         $cart = Cart::with('items.product')->where('user_id', $user->id)->first();
 
         if (!$cart || $cart->items->isEmpty()) {
             return response()->json(['success' => false, 'message' => 'Sepetiniz boş'], 400);
         }
 
-        // DB Transaction Başlat (Hata olursa işlemi geri almak için)
         return DB::transaction(function () use ($user, $cart) {
             
             $totalAmount = 0;
             
-            // 1. Stok Kontrolü ve Toplam Tutar Hesaplama
             foreach ($cart->items as $item) {
                 if ($item->product->stock_quantity < $item->quantity) {
-                    // Hata fırlatıp işlemi iptal ediyoruz
                     throw new \Exception("Üzgünüz, {$item->product->name} ürünü için yeterli stok yok.");
                 }
                 $totalAmount += $item->product->price * $item->quantity;
             }
 
-            // 2. Siparişi Oluştur
             $order = Order::create([
                 'user_id' => $user->id,
                 'total_amount' => $totalAmount,
                 'status' => 'pending'
             ]);
 
-            // 3. Sipariş Detaylarını Ekle ve STOKTAN DÜŞ
             foreach ($cart->items as $item) {
                 OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $item->product_id,
                     'quantity' => $item->quantity,
-                    'price' => $item->product->price // O anki fiyatı kaydediyoruz
+                    'price' => $item->product->price
                 ]);
 
-                // BONUS: Stoktan düşme işlemi
                 $item->product->decrement('stock_quantity', $item->quantity);
             }
 
-            // 4. Sepeti Temizle
             CartItem::where('cart_id', $cart->id)->delete();
 
-            // LOGLAMA İŞLEMİ (BONUS)
             Log::info('Yeni sipariş oluşturuldu.', [
                 'order_id' => $order->id,
                 'user_id' => $user->id,
@@ -94,8 +84,6 @@ class OrderController extends Controller
                 'time' => now()
             ]);
 
-            // EMAIL GÖNDERME (YENİ BONUS)
-            // Hata olursa sistem durmasın diye try-catch içine alıyoruz
             try {
                 Mail::to($user->email)->send(new OrderPlaced($order));
             } catch (\Exception $e) {
@@ -129,7 +117,6 @@ class OrderController extends Controller
      * @OA\Response(response=401, description="Yetkisiz erişim")
      * )
      */
-    // 2. KULLANICININ SİPARİŞLERİNİ LİSTELE (GET /api/orders)
     public function index()
     {
         $orders = Order::where('user_id', Auth::id())->orderBy('created_at', 'desc')->get();
@@ -167,7 +154,6 @@ class OrderController extends Controller
      * @OA\Response(response=401, description="Yetkisiz erişim")
      * )
      */
-    // 3. SİPARİŞ DETAYI (GET /api/orders/{id})
     public function show($id)
     {
         $order = Order::with('items.product')
@@ -221,10 +207,8 @@ class OrderController extends Controller
      * @OA\Response(response=403, description="Admin yetkisi gerekli")
      * )
      */
-    // 4. SİPARİŞ DURUMUNU GÜNCELLE (Sadece Admin) - PUT /api/orders/{id}/status
     public function updateStatus(Request $request, $id)
     {
-        // Validasyon: Sadece belirli durumlar girilebilir
         $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
             'status' => 'required|in:pending,shipped,delivered,cancelled'
         ]);

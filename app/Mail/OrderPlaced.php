@@ -13,15 +13,13 @@ class OrderPlaced extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $order; // Siparişi burada tutacağız
+    public $order;
 
-    // Kurucu metod: Siparişi içeri al
     public function __construct(Order $order)
     {
         $this->order = $order;
     }
 
-    // E-posta Başlığı (Konusu)
     public function envelope(): Envelope
     {
         return new Envelope(
@@ -29,7 +27,6 @@ class OrderPlaced extends Mailable
         );
     }
 
-    // E-posta İçeriği (Basit Text Formatı)
     public function content(): Content
     {
         return new Content(
