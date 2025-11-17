@@ -17,7 +17,7 @@ Projeyi yerel ortamınızda çalıştırmak için aşağıdaki adımları izleyi
 1. **Projeyi İndirin:**
 
     ```bash
-    git clone [GITHUB_REPO_LINKINIZ]
+    git clone https://github.com/Ahmetenesyensiz/e-commerce-api
     cd e-commerce-api
     ```
 
